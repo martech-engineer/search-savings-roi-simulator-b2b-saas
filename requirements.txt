@@ -1,0 +1,2 @@
+pandas
+gradio==4.44.1
