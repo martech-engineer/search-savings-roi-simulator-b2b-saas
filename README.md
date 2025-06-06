@@ -1,49 +1,24 @@
 ---
-title: SEO ROI Forecaster
+title: SEO ROI Forecasting Tool
 emoji: 📈
-colorFrom: indigo
+colorFrom: blue
 colorTo: green
-sdk: gradio
-sdk_version: "4.44.1"
+sdk: streamlit
+sdk_version: "1.35.0"
 app_file: app.py
-pinned: false
+pinned: true
 ---
 
 
-# 📊 SEO ROI Forecasting Tool for B2B SaaS
+# 📈 SEO ROI Forecasting Tool for B2B SaaS
 
-This tool helps growth and marketing leaders at B2B SaaS companies translate **organic keyword improvements** into **forecasted revenue** and **ROI**.
+This tool helps B2B SaaS growth teams translate SEO opportunities into revenue projections. Upload your Google Search Console export and simulate how better rankings translate to:
 
-## 🔍 How it Works
+- 📊 More clicks
+- 🧲 More leads
+- 💰 Higher MRR
+- 🔁 Return on SEO investment
 
-1. **Upload your Google Search Console (GSC) export**  
-   The file should contain columns like `query`, `impressions`, and `position`.
+Try it now on the [🤗 Hugging Face Space](https://huggingface.co/spaces/Em4e/seo-b2b-saas-forecasting-tool)!
 
-2. **Set your business assumptions**
-   - Target ranking position (e.g., position 4)
-   - Conversion rate: visitor → lead
-   - Close rate: lead → customer
-   - Monthly Recurring Revenue (MRR) per customer
-   - Your total SEO investment
-
-3. **Opportunity Identification**  
-   The app focuses on keywords ranking in **positions 5–20**, simulating gains if they were improved to the target position.
-
-4. **Business Impact Forecasting**  
-   Using CTR benchmarks, the tool estimates:
-   - Additional traffic
-   - New leads and customers
-   - Incremental MRR
-   - ROI based on your SEO cost
-
-5. **Prioritized Output**  
-   Keywords are labeled as **High ROI**, **Moderate ROI**, or **Low Priority**, sorted by forecasted MRR.
-
----
-
-## 📁 Example Input Format
-
-```csv
-query,impressions,position
-b2b saas seo strategy,1234,11.4
-keyword intent model,845,8.9
+> If you don’t upload a CSV, the app uses a sample file automatically.
