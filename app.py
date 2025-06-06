@@ -11,6 +11,7 @@ st.title("📈 SEO ROI Forecasting Tool for B2B SaaS")
 st.markdown("""
 This app helps you estimate the **financial upside** of ranking improvements for your SEO keywords.
 To upload a sample file, use the one @ https://huggingface.co/spaces/Em4e/seo-b2b-saas-forecasting-tool/blob/main/sample_gsc_data.csv
+Developed by: Emilija Gjorgjevska https://www.linkedin.com/in/emilijagjorgjevska/
 """)
 
 # === Inputs ===
