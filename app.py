@@ -157,7 +157,6 @@ def calculate(
 # Set Streamlit page configuration for a wider layout and a descriptive title.
 st.set_page_config(page_title="SEO ROI & Savings Forecasting", layout="wide")
 st.title("📈 B2B SaaS SEO ROI & Savings Simulator")
-st.write("---")
 st.markdown("App created by [Emilija Gjorgjevska](https://www.linkedin.com/in/emilijagjorgjevska/)")
 # ℹ️ How the app works
 # This section provides an expandable information box explaining the app's methodology.
