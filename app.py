@@ -15,26 +15,29 @@ st.title("📈 SEO ROI & Savings Forecasting Tool for B2B SaaS")
 # ---
 # ℹ️ How the app works
 with st.expander("ℹ️ How the app works", expanded=True):
-    st.markdown("""<div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px;">
-    <p>1. <b>Load your GSC data</b> (we lowercase all column names on load). If no file is uploaded, we use the default sample data. If no <code>cpc</code> column is present, we simulate values between 0.50–3.00 dollars.</p>
-    <p>2. <b>CTR benchmarks</b> by position map an expected click-through rate for positions 1–20.</p>
-    <p>3. <b>Incremental Clicks</b> = Projected_Clicks – Current_Clicks</p>
-    <p>&nbsp;&nbsp;&nbsp;&nbsp;• Current_Clicks = Impressions × Current_CTR</p>
-    <p>&nbsp;&nbsp;&nbsp;&nbsp;• Projected_Clicks = Impressions × Target_CTR</p>
-    <p>4. <b>Financials</b></p>
-    <p>&nbsp;&nbsp;&nbsp;&nbsp;• <b>Avoided Paid Spend</b> = Incremental_Clicks × CPC. This represents the money you <b>don't</b> have to spend on paid ads because your organic SEO efforts are now bringing in those clicks and conversions.</p>
-    <p>&nbsp;&nbsp;&nbsp;&nbsp;• <b>Net Savings vs Paid</b> = Avoided Paid Spend – SEO Investment</p>
-    <p>&nbsp;&nbsp;&nbsp;&nbsp;• <b>Incremental MRR</b> = Customers × MRR_per_Customer</p>
-    <p>&nbsp;&nbsp;&nbsp;&nbsp;• <b>SEO ROI</b> = (Incremental MRR – SEO Investment) ÷ SEO Investment</p>
-    <p><b>Understanding "Additional Ad Spend"</b></p>
-    <p>The "Additional Ad Spend" input in the sidebar is a <b>hypothetical budget figure you provide for comparison</b>. It's <b>not</b> calculated from your GSC data or CPC. Instead, it allows you to:</p>
-    <ul>
-        <li><b>Compare SEO's revenue generation directly against a specific paid ad budget.</b> For instance, if you're considering spending an extra \$X on Google Ads, you can see if your SEO's projected incremental MRR is higher or lower than that \$X.</li>
-        <li><b>Visualize the efficiency of your SEO investment.</b> If your SEO investment generates significantly more incremental MRR than a comparable "Additional Ad Spend," it highlights SEO as a potentially more effective use of marketing funds.</li>
-    </ul>
-    <p>The "Ad Spend" metric will be <span style="color: green; font-weight: bold;">green</span> if your projected Incremental MRR from SEO is <b>greater than</b> this additional ad spend, and <span style="color: red; font-weight: bold;">red</span> if it does not.</p>
-    <p>5. <b>Results</b></p>
-    <p>Top-line metrics + keyword-level table with impact labels.</p></div>""", unsafe_allow_html=True) # Ensure this is within the st.expander context
+    st.markdown("""
+    <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px;">
+      <p>1. <b>Load your GSC data</b> (we lowercase all column names on load). If no file is uploaded, we use the default sample data. If no <code>cpc</code> column is present, we simulate values between 0.50 and 3.00 dollars.</p>
+      <p>2. <b>CTR benchmarks</b> by position map an expected click-through rate for positions 1–20.</p>
+      <p>3. <b>Incremental Clicks</b> = Projected_Clicks – Current_Clicks</p>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;• Current_Clicks = Impressions × Current_CTR</p>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;• Projected_Clicks = Impressions × Target_CTR</p>
+      <p>4. <b>Financials</b></p>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;• <b>Avoided Paid Spend</b> = Incremental_Clicks × CPC. This represents the money you <b>don't</b> have to spend on paid ads because your organic SEO efforts are now bringing in those clicks and conversions.</p>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;• <b>Net Savings vs Paid</b> = Avoided Paid Spend – SEO Investment</p>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;• <b>Incremental MRR</b> = Customers × MRR_per_Customer</p>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;• <b>SEO ROI</b> = (Incremental MRR – SEO Investment) ÷ SEO Investment</p>
+      <p><b>Understanding "Additional Ad Spend"</b></p>
+      <p>The "Additional Ad Spend" input in the sidebar is a <b>hypothetical budget figure you provide for comparison</b>. It's <b>not</b> calculated from your GSC data or CPC. Instead, it allows you to:</p>
+      <ul>
+        <li><b>Compare SEO's revenue generation directly against a specific paid ad budget.</b> For instance, if you're considering spending an extra X dollars on Google Ads, you can see whether your SEO's projected incremental MRR is higher or lower than that same amount.</li>
+        <li><b>Visualize the efficiency of your SEO investment.</b> If your SEO investment generates significantly more incremental MRR than a comparable additional ad spend, it highlights SEO as a potentially more effective use of marketing funds.</li>
+      </ul>
+      <p>The "Ad Spend" metric will be <span style="color: green; font-weight: bold;">green</span> if your projected Incremental MRR from SEO is <b>greater than</b> this additional ad spend, and <span style="color: red; font-weight: bold;">red</span> if it is not.</p>
+      <p>5. <b>Results</b></p>
+      <p>Top-line metrics and keyword-level table with impact labels.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 # — Sidebar inputs
 with st.sidebar:
