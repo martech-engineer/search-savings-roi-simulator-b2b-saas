@@ -15,31 +15,45 @@ st.title("📈 SEO ROI & Savings Forecasting Tool for B2B SaaS")
 # — Info section explaining the math
 with st.expander("ℹ️ How the app works", expanded=True):
     st.markdown("""
-1. **Load your GSC data** (we lowercase all column names on load). If not, we use the default sample file.
-   If no `cpc` column is present, we simulate values between \$0.50–\$3.00.  
-2. **CTR benchmarks** by position map an expected click-through rate for positions 1–20.  
-3. **Incremental clicks** =  
-   &nbsp;&nbsp;Projected_Clicks – Current_Clicks  
-   &nbsp;&nbsp;• Current_Clicks = Impressions × Current_CTR  
-   &nbsp;&nbsp;• Projected_Clicks = Impressions × Target_CTR  
-4. **Financials**  
-   &nbsp;&nbsp;• Avoided Paid Spend = Incremental_Clicks × CPC  
-   &nbsp;&nbsp;• Net Savings vs Paid = Avoided Paid Spend – SEO Investment  
-   &nbsp;&nbsp;• Incremental MRR = Customers × MRR_per_Customer  
-   &nbsp;&nbsp;• SEO ROI = (Incremental MRR – SEO Investment) ÷ SEO Investment  
-5. **Results**  
-   Top-line metrics + keyword-level table with impact labels.
+1.  **Load your GSC data** (we lowercase all column names on load). If not, we use the default sample file.
+    If no `cpc` column is present, we simulate values between $0.50–$3.00.
+2.  **CTR benchmarks** by position map an expected click-through rate for positions 1–20.
+3.  **Incremental clicks** =
+    &nbsp;&nbsp;Projected_Clicks – Current_Clicks
+    &nbsp;&nbsp;• Current_Clicks = Impressions × Current_CTR
+    &nbsp;&nbsp;• Projected_Clicks = Impressions × Target_CTR
+4.  **Financials**
+    &nbsp;&nbsp;• Avoided Paid Spend = Incremental_Clicks × CPC. This represents the **money you *don't* have to spend on paid ads** because your organic SEO efforts are now bringing in those clicks and conversions.
+    &nbsp;&nbsp;• Net Savings vs Paid = Avoided Paid Spend – SEO Investment
+    &nbsp;&nbsp;• Incremental MRR = Customers × MRR_per_Customer
+    &nbsp;&nbsp;• SEO ROI = (Incremental MRR – SEO Investment) ÷ SEO Investment
+
+    **Understanding "Additional Paid Spend"**
+    The "Additional Paid Spend" input in the sidebar is a **hypothetical budget figure you provide for comparison**. It's *not* calculated from your GSC data or CPC. Instead, it allows you to:
+    * **Compare SEO's revenue generation directly against a specific paid ad budget.** For instance, if you're considering spending an extra $X on Google Ads, you can see if your SEO's projected incremental MRR is higher or lower than that $X.
+    * **Visualize the efficiency of your SEO investment.** If your SEO investment generates significantly more incremental MRR than a comparable "Additional Paid Spend," it highlights SEO as a potentially more effective use of marketing funds.
+    * The "Add Spend" metric will show :green[green] if your projected incremental MRR from SEO **trumps** (is greater than) this additional paid spend, and :red[red] if it does not.
+
+5.  **Results**
+    Top-line metrics + keyword-level table with impact labels.
     """, unsafe_allow_html=True)
 
 # — Sidebar inputs
 with st.sidebar:
     st.header("🔧 Assumptions & Inputs")
     uploaded_file    = st.file_uploader("Upload GSC CSV", type="csv")
-    target_position  = st.slider("Target SERP Position",        1.0, 10.0, 4.0, 0.5)
+    target_position  = st.slider("Target SERP Position",
+        1.0, 10.0, 4.0, 0.5)
     conversion_rate  = st.slider("Conversion Rate (% → signup)", 0.1, 10.0, 2.0, 0.1)
-    close_rate       = st.slider("Close Rate (% → customer)",    1.0, 100.0, 20.0, 1.0)
-    mrr_per_customer = st.slider("MRR per Customer ($)",         10,    1000, 200, 10)
-    seo_cost         = st.slider("Total SEO Investment ($)",     1_000, 100_000, 10_000, 1_000)
+    close_rate       = st.slider("Close Rate (% → customer)",
+        1.0, 100.0, 20.0, 1.0)
+    mrr_per_customer = st.slider("MRR per Customer ($)",
+        10,    1000, 200, 10)
+    seo_cost         = st.slider("Total SEO Investment ($)",
+        1_000, 100_000, 10_000, 1_000)
+    add_spend        = st.slider("Additional Paid Spend ($)",
+        0, 50_000, 0, 1_000)
+
 
 # — Download sample CSV button
 sample_bytes = requests.get(SAMPLE_FILE_URL).content
@@ -68,11 +82,10 @@ def load_csv():
     if 'cpc' not in df.columns:
         st.warning("No `cpc` column found—simulating CPC values between $0.50–$3.00.")
         df['cpc'] = np.round(np.random.uniform(0.5, 3.0, size=len(df)), 2)
-
     return df
 
 # === Core calculation ===
-def calculate(df):
+def calculate(df, target_position, conversion_rate, close_rate, mrr_per_customer, seo_cost, add_spend):
     # required columns mapping
     cols = {c: c for c in df.columns}
     required = {
@@ -135,6 +148,9 @@ def calculate(df):
     tot_mrr       = df['mrr'].sum()
     seo_roi_pct   = float('inf') if seo_cost == 0 else ((tot_mrr - seo_cost) / seo_cost) * 100
 
+    # Calculate if SEO investment trumps add spend (using Incremental MRR for comparison)
+    seo_trumps_add_spend = tot_mrr > add_spend
+
     summary = {
         "clicks":    f"{tot_clicks:,.0f}",
         "signups":   f"{tot_signups:,.1f}",
@@ -142,7 +158,9 @@ def calculate(df):
         "mrr":       f"${tot_mrr:,.2f}",
         "roi":       f"{seo_roi_pct:,.2f}%",
         "avoid":     f"${total_avoided:,.2f}",
-        "net":       f"${net_savings:,.2f}"
+        "net":       f"${net_savings:,.2f}",
+        "add_spend": f"${add_spend:,.2f}", # Include add_spend in summary
+        "seo_trumps_add_spend": seo_trumps_add_spend # Boolean for coloring
     }
 
     # keyword-level table
@@ -159,16 +177,16 @@ def calculate(df):
     )
     out = out.sort_values(['Impact','Projected Incremental MRR ($)'],
                           ascending=[True, False])
-
     return summary, out
 
 # === Run forecast & display ===
 if st.button("Run Forecast"):
     df = load_csv()
     if df is not None:
-        summary, table = calculate(df)
+        # Pass all relevant inputs to the calculate function
+        summary, table = calculate(df, target_position, conversion_rate, close_rate, mrr_per_customer, seo_cost, add_spend)
         if summary:
-            c1,c2,c3,c4,c5,c6,c7 = st.columns(7)
+            c1,c2,c3,c4,c5,c6,c7,c8 = st.columns(8) # Added one more column for add_spend
             c1.metric("Incremental Clicks",     summary['clicks'])
             c2.metric("Projected Signups",      summary['signups'])
             c3.metric("New Customers",          summary['customers'])
@@ -176,6 +194,14 @@ if st.button("Run Forecast"):
             c5.metric("SEO ROI",                summary['roi'])
             c6.metric("Avoided Paid Spend",     summary['avoid'])
             c7.metric("Net Savings vs Paid",    summary['net'])
+
+            # Add Spend section with conditional coloring
+            with c8:
+                st.markdown(
+                    f"**Add Spend**<br>"
+                    f"<span style='color: {'green' if summary['seo_trumps_add_spend'] else 'red'}; font-size: 24px; font-weight: bold;'>{summary['add_spend']}</span>",
+                    unsafe_allow_html=True
+                )
 
             st.subheader("📊 Opportunity Keywords")
             st.dataframe(table, use_container_width=True)
