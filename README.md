@@ -1,15 +1,3 @@
----
-title: SEO ROI Forecasting Tool
-emoji: 📈
-colorFrom: blue
-colorTo: green
-sdk: streamlit
-sdk_version: "1.35.0"
-app_file: app.py
-pinned: true
----
-
-
 # 📈 SEO ROI Forecasting Tool for B2B SaaS
 
 This tool helps B2B SaaS growth teams translate SEO opportunities into revenue projections. Upload your Google Search Console export and simulate how better rankings translate to:
