@@ -42,7 +42,7 @@ def load_csv(uploaded_file_obj):
 
     # Check for 'cpc' column; if missing, simulate values
     if "cpc" not in df.columns:
-        st.warning("No `cpc` column found—simulating CPC values between $0.50–$3.00.")
+        st.warning("No `cpc` column found—simulating CPC values between $0.50–$3.00 (for testing purposes only!)")
         df["cpc"] = np.round(np.random.uniform(0.5, 3.0, size=len(df)), 2)
     return df
 
