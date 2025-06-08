@@ -13,10 +13,11 @@ st.set_page_config(page_title="SEO ROI & Savings Forecasting", layout="wide")
 st.title("📈 SEO ROI & Savings Forecasting Tool for B2B SaaS")
 
 # ---
-## ℹ️ How the app works
-
+# ℹ️ How the app works
+with st.expander("ℹ️ How the app works", expanded=True):
+    st.markdown("""
 <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px;">
-    <p>1. <b>Load your GSC data</b> (we lowercase all column names on load). If no file is uploaded, we use the default sample data. If no <code>cpc</code> column is present, we simulate values between $0.50–$3.00.</p>
+    <p>1. <b>Load your GSC data</b> (we lowercase all column names on load). If no file is uploaded, we use the default sample data. If no <code>cpc</code> column is present, we simulate values between \\$0.50–\\$3.00.</p>
     <p>2. <b>CTR benchmarks</b> by position map an expected click-through rate for positions 1–20.</p>
     <p>3. <b>Incremental Clicks</b> = Projected_Clicks – Current_Clicks</p>
     <p>&nbsp;&nbsp;&nbsp;&nbsp;• Current_Clicks = Impressions × Current_CTR</p>
@@ -29,18 +30,18 @@ st.title("📈 SEO ROI & Savings Forecasting Tool for B2B SaaS")
     <p><b>Understanding "Additional Ad Spend"</b></p>
     <p>The "Additional Ad Spend" input in the sidebar is a <b>hypothetical budget figure you provide for comparison</b>. It's <b>not</b> calculated from your GSC data or CPC. Instead, it allows you to:</p>
     <ul>
-        <li><b>Compare SEO's revenue generation directly against a specific paid ad budget.</b> For instance, if you're considering spending an extra $X on Google Ads, you can see if your SEO's projected incremental MRR is higher or lower than that $X.</li>
+        <li><b>Compare SEO's revenue generation directly against a specific paid ad budget.</b> For instance, if you're considering spending an extra \\$X on Google Ads, you can see if your SEO's projected incremental MRR is higher or lower than that \\$X.</li>
         <li><b>Visualize the efficiency of your SEO investment.</b> If your SEO investment generates significantly more incremental MRR than a comparable "Additional Ad Spend," it highlights SEO as a potentially more effective use of marketing funds.</li>
     </ul>
     <p>The "Ad Spend" metric will show <span style="color: green; font-weight: bold;">green</span> if your projected Incremental MRR from SEO <b>trumps</b> (is greater than) this additional ad spend, and <span style="color: red; font-weight: bold;">red</span> if it does not.</p>
     <p>5. <b>Results</b></p>
     <p>Top-line metrics + keyword-level table with impact labels.</p>
 </div>
----
+""", unsafe_allow_html=True) # Ensure this is within the st.expander context
 
-# 🔧 Assumptions & Inputs
-
+# — Sidebar inputs
 with st.sidebar:
+    st.header("🔧 Assumptions & Inputs") # Moved st.header inside with block
     uploaded_file    = st.file_uploader("Upload GSC CSV", type="csv")
     target_position  = st.slider("Target SERP Position",
         1.0, 10.0, 4.0, 0.5)
@@ -51,7 +52,6 @@ with st.sidebar:
         10,    1000, 200, 10)
     seo_cost         = st.slider("Total SEO Investment ($)",
         1_000, 100_000, 10_000, 1_000)
-    # Corrected to "Ad Spend"
     add_spend        = st.slider("Additional Ad Spend ($)",
         0, 50_000, 0, 1_000)
 
@@ -132,7 +132,7 @@ def calculate(df, target_position, conversion_rate, close_rate, mrr_per_customer
 
     # conversions → MRR
     conv  = conversion_rate / 100
-    close = close_rate      / 100
+    close = close_rate       / 100
     df['signups']    = df['incremental_clicks'] * conv
     df['customers']  = df['signups']            * close
     df['mrr']        = df['customers']          * mrr_per_customer
@@ -199,7 +199,7 @@ if st.button("Run Forecast"):
             # Ad Spend section with conditional coloring
             with c8:
                 st.markdown(
-                    f"**Ad Spend**<br>" # Corrected label
+                    f"**Ad Spend**<br>"
                     f"<span style='color: {'green' if summary['seo_trumps_add_spend'] else 'red'}; font-size: 24px; font-weight: bold;'>{summary['add_spend']}</span>",
                     unsafe_allow_html=True
                 )
