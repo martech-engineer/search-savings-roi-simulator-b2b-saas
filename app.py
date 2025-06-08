@@ -18,7 +18,7 @@ class DataLoader:
         self.sample_file_url = sample_file_url
 
     @st.cache_data
-    # FIX: Change 'self' to '_self' in the function signature AND rename the parameter
+    # _self is correct for the instance itself
     def load_csv(_self, uploaded_file_obj: st.runtime.uploaded_file_manager.UploadedFile | None) -> pd.DataFrame | None:
         """
         Loads the GSC data from an uploaded CSV or a sample URL,
@@ -69,8 +69,6 @@ class SeoCalculator:
         """Helper to get CTR based on position, defaulting to 0.005 for positions > 20."""
         return self.ctr_benchmarks.get(int(round(position)), 0.005)
 
-    # Note: _validate_and_rename_columns does not need @st.cache_data if its inputs are always hashable
-    # and it's called from a cached function. If it *were* cached, 'self' -> '_self' would apply.
     def _validate_and_rename_columns(self, df: pd.DataFrame) -> pd.DataFrame | None:
         """Validates required columns and renames them to a standardized format."""
         found_columns = {}
@@ -85,7 +83,7 @@ class SeoCalculator:
         return df.rename(columns={found_columns[k]: k for k in found_columns})
 
     @st.cache_data
-    # FIX: Change 'self' to '_self' in the function signature AND rename the parameter
+    # _self is correct for the instance itself
     def calculate_metrics(
         _self, # Changed to _self
         df: pd.DataFrame,
@@ -297,13 +295,12 @@ class SeoAppUI:
         self._display_info_expander()
         uploaded_file, target_position, conversion_rate, close_rate, mrr_per_customer, seo_cost, add_spend = self._get_sidebar_inputs()
 
-        # Call load_csv, passing the instance as the first argument, which is now _self
-        df = self.data_loader.load_csv(self.data_loader, uploaded_file) # Pass self.data_loader explicitly
+        # FIX: Call load_csv normally, Python handles the _self
+        df = self.data_loader.load_csv(uploaded_file)
 
         if df is not None:
-            # Call calculate_metrics, passing the instance as the first argument, which is now _self
+            # FIX: Call calculate_metrics normally, Python handles the _self
             metrics, df_results = self.seo_calculator.calculate_metrics(
-                self.seo_calculator, # Pass self.seo_calculator explicitly
                 df,
                 target_position,
                 conversion_rate,
