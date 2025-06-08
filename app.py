@@ -161,7 +161,7 @@ class SeoAppUI:
 
     def _set_page_config(self):
         st.set_page_config(page_title="SEO ROI & Savings Forecasting", layout="wide")
-        st.title("B2B SaaS SEO ROI & Savings Simulator")
+        st.title("Search & Savings ROI Simulator for B2B SaaS")
         st.markdown("App created by [Emilija Gjorgjevska](https://www.linkedin.com/in/emilijagjorgjevska/)")
 
     def _display_info_expander(self):
