@@ -15,8 +15,7 @@ st.title("📈 SEO ROI & Savings Forecasting Tool for B2B SaaS")
 # ---
 # ℹ️ How the app works
 with st.expander("ℹ️ How the app works", expanded=True):
-    st.markdown("""
-<div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px;">
+    st.markdown("""<div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px;">
     <p>1. <b>Load your GSC data</b> (we lowercase all column names on load). If no file is uploaded, we use the default sample data. If no <code>cpc</code> column is present, we simulate values between 0.50–3.00 dollars.</p>
     <p>2. <b>CTR benchmarks</b> by position map an expected click-through rate for positions 1–20.</p>
     <p>3. <b>Incremental Clicks</b> = Projected_Clicks – Current_Clicks</p>
@@ -35,9 +34,7 @@ with st.expander("ℹ️ How the app works", expanded=True):
     </ul>
     <p>The "Ad Spend" metric will show <span style="color: green; font-weight: bold;">green</span> if your projected Incremental MRR from SEO <b>trumps</b> (is greater than) this additional ad spend, and <span style="color: red; font-weight: bold;">red</span> if it does not.</p>
     <p>5. <b>Results</b></p>
-    <p>Top-line metrics + keyword-level table with impact labels.</p>
-</div>
-""", unsafe_allow_html=True) # Ensure this is within the st.expander context
+    <p>Top-line metrics + keyword-level table with impact labels.</p></div>""", unsafe_allow_html=True) # Ensure this is within the st.expander context
 
 # — Sidebar inputs
 with st.sidebar:
@@ -54,7 +51,6 @@ with st.sidebar:
         1_000, 100_000, 10_000, 1_000)
     add_spend        = st.slider("Additional Ad Spend ($)",
         0, 50_000, 0, 1_000)
-
 
 # — Download sample CSV button
 sample_bytes = requests.get(SAMPLE_FILE_URL).content
@@ -113,96 +109,94 @@ def calculate(df, target_position, conversion_rate, close_rate, mrr_per_customer
     ctr.update({i: 0.005 for i in range(11,21)})
     get_ctr = lambda p: ctr.get(int(round(p)), 0.005)
 
-    # filter positions 5–20
-    df = df[df['position'].between(5, 20)].copy()
-    if df.empty:
-        st.warning("No keywords in positions 5–20.")
-        return None, pd.DataFrame()
-
-    # clicks projections
-    df['current_ctr']     = df['position'].map(get_ctr)
-    df['target_ctr']      = get_ctr(target_position)
-    df['current_clicks']  = df['impressions'] * df['current_ctr']
+    df['current_ctr'] = df['position'].apply(get_ctr)
+    df['target_ctr'] = df['position'].apply(lambda x: ctr.get(int(round(target_position)), 0.005))
+    
+    df['current_clicks'] = df['impressions'] * df['current_ctr']
     df['projected_clicks'] = df['impressions'] * df['target_ctr']
     df['incremental_clicks'] = df['projected_clicks'] - df['current_clicks']
-    df = df[df['incremental_clicks'] > 0]
-    if df.empty:
-        st.warning("No positive incremental clicks projected.")
-        return None, pd.DataFrame()
-
-    # conversions → MRR
-    conv  = conversion_rate / 100
-    close = close_rate       / 100
-    df['signups']    = df['incremental_clicks'] * conv
-    df['customers']  = df['signups']            * close
-    df['mrr']        = df['customers']          * mrr_per_customer
-
-    # financials: avoided spend & net savings
+    
     df['avoided_paid_spend'] = df['incremental_clicks'] * df['cpc']
-    total_avoided            = df['avoided_paid_spend'].sum()
-    net_savings              = total_avoided - seo_cost
+    
+    # Financial calculations
+    total_avoided_paid_spend = df['avoided_paid_spend'].sum()
+    net_savings_vs_paid = total_avoided_paid_spend - seo_cost
+    
+    total_incremental_conversions = df['incremental_clicks'].sum() * (conversion_rate / 100)
+    total_incremental_customers = total_incremental_conversions * (close_rate / 100)
+    
+    incremental_mrr = total_incremental_customers * mrr_per_customer
+    
+    # SEO ROI calculation
+    if seo_cost > 0:
+        seo_roi = (incremental_mrr - seo_cost) / seo_cost
+    else:
+        seo_roi = np.inf # Undefined or very high if no SEO cost
 
-    # totals & ROI
-    tot_clicks    = df['incremental_clicks'].sum()
-    tot_signups   = df['signups'].sum()
-    tot_customers = df['customers'].sum()
-    tot_mrr       = df['mrr'].sum()
-    seo_roi_pct   = float('inf') if seo_cost == 0 else ((tot_mrr - seo_cost) / seo_cost) * 100
+    # Categorize impact for each query
+    def categorize_impact(row):
+        if row['position'] > target_position:
+            return '🚀 Improvement'
+        elif row['position'] <= target_position and row['incremental_clicks'] > 0:
+            return '✅ Maintain & Grow'
+        else:
+            return '🎯 Reached Target'
+            
+    df['impact_category'] = df.apply(categorize_impact, axis=1)
 
-    # Calculate if SEO investment trumps add spend (using Incremental MRR for comparison)
-    seo_trumps_add_spend = tot_mrr > add_spend
+    return {
+        'total_avoided_paid_spend': total_avoided_paid_spend,
+        'net_savings_vs_paid': net_savings_vs_paid,
+        'total_incremental_conversions': total_incremental_conversions,
+        'total_incremental_customers': total_incremental_customers,
+        'incremental_mrr': incremental_mrr,
+        'seo_roi': seo_roi
+    }, df
 
-    summary = {
-        "clicks":    f"{tot_clicks:,.0f}",
-        "signups":   f"{tot_signups:,.1f}",
-        "customers": f"{tot_customers:,.1f}",
-        "mrr":       f"${tot_mrr:,.2f}",
-        "roi":       f"{seo_roi_pct:,.2f}%",
-        "avoid":     f"${total_avoided:,.2f}",
-        "net":       f"${net_savings:,.2f}",
-        "add_spend": f"${add_spend:,.2f}", # Include add_spend in summary
-        "seo_trumps_add_spend": seo_trumps_add_spend # Boolean for coloring
-    }
+# ---
+# Main app logic
+df = load_csv()
 
-    # keyword-level table
-    out = df[['query', 'mrr', 'avoided_paid_spend']].copy()
-    out.columns = [
-        'Keyword',
-        'Projected Incremental MRR ($)',
-        'Avoided Paid Spend ($)'
-    ]
-    out['Impact'] = pd.cut(
-        out['Projected Incremental MRR ($)'],
-        bins=[-1, 500, 2000, float('inf')],
-        labels=['Low Priority','Moderate ROI','High ROI']
-    )
-    out = out.sort_values(['Impact','Projected Incremental MRR ($)'],
-                          ascending=[True, False])
-    return summary, out
+if df is not None:
+    metrics, df_results = calculate(df.copy(), target_position, conversion_rate, close_rate, mrr_per_customer, seo_cost, add_spend)
 
-# === Run forecast & display ===
-if st.button("Run Forecast"):
-    df = load_csv()
-    if df is not None:
-        # Pass all relevant inputs to the calculate function
-        summary, table = calculate(df, target_position, conversion_rate, close_rate, mrr_per_customer, seo_cost, add_spend)
-        if summary:
-            c1,c2,c3,c4,c5,c6,c7,c8 = st.columns(8) # Added one more column for add_spend
-            c1.metric("Incremental Clicks",     summary['clicks'])
-            c2.metric("Projected Signups",      summary['signups'])
-            c3.metric("New Customers",          summary['customers'])
-            c4.metric("Incremental MRR",        summary['mrr'])
-            c5.metric("SEO ROI",                summary['roi'])
-            c6.metric("Avoided Paid Spend",     summary['avoid'])
-            c7.metric("Net Savings vs Paid",    summary['net'])
+    if metrics is not None:
+        st.write("---")
+        st.header("📊 SEO Performance Summary")
 
-            # Ad Spend section with conditional coloring
-            with c8:
-                st.markdown(
-                    f"**Ad Spend**<br>"
-                    f"<span style='color: {'green' if summary['seo_trumps_add_spend'] else 'red'}; font-size: 24px; font-weight: bold;'>{summary['add_spend']}</span>",
-                    unsafe_allow_html=True
-                )
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric(label="Total Avoided Paid Spend 💰", value=f"${metrics['total_avoided_paid_spend']:,.2f}")
+        with col2:
+            st.metric(label="Net Savings vs Paid 📈", value=f"${metrics['net_savings_vs_paid']:,.2f}")
+        with col3:
+            st.metric(label="Incremental MRR  recurrent revenue 🚀", value=f"${metrics['incremental_mrr']:,.2f}")
+        
+        col4, col5, col6 = st.columns(3)
+        with col4:
+            st.metric(label="Total Incremental Conversions 🎯", value=f"{metrics['total_incremental_conversions']:,.0f}")
+        with col5:
+            st.metric(label="Total Incremental Customers 🤝", value=f"{metrics['total_incremental_customers']:,.0f}")
+        with col6:
+            st.metric(label="SEO ROI (Return on Investment) 💰", value=f"{metrics['seo_roi']:.2%}")
+        
+        st.write("---")
+        st.header("Detailed Keyword Performance")
+        st.dataframe(df_results[[
+            'query', 'impressions', 'position', 'current_ctr', 'target_ctr', 
+            'current_clicks', 'projected_clicks', 'incremental_clicks', 
+            'cpc', 'avoided_paid_spend', 'impact_category'
+        ]].sort_values(by='incremental_clicks', ascending=False), use_container_width=True)
 
-            st.subheader("📊 Opportunity Keywords")
-            st.dataframe(table, use_container_width=True)
+        st.write("---")
+        st.header("Hypothetical Comparison: SEO vs. Additional Ad Spend")
+        col_ad1, col_ad2 = st.columns(2)
+        with col_ad1:
+            st.metric(label="Incremental MRR from SEO", value=f"${metrics['incremental_mrr']:,.2f}")
+        with col_ad2:
+            ad_spend_color = "green" if metrics['incremental_mrr'] > add_spend else "red"
+            st.markdown(f"**Additional Ad Spend (for comparison)**: <span style='color:{ad_spend_color}; font-weight:bold;'>${add_spend:,.2f}</span>", unsafe_allow_html=True)
+            if metrics['incremental_mrr'] > add_spend:
+                st.success(f"SEO's incremental MRR is ${metrics['incremental_mrr'] - add_spend:,.2f} higher than the additional ad spend!")
+            else:
+                st.warning(f"Additional ad spend is ${add_spend - metrics['incremental_mrr']:,.2f} higher than SEO's incremental MRR.")
