@@ -6,7 +6,7 @@ import requests
 # Constants
 SAMPLE_FILE_URL = (
     "https://huggingface.co/spaces/Em4e/seo-b2b-saas-forecasting-tool/"
-    "resolve/main/sample_gsc_data.csv"
+    "resolve/main/sample_keyword_data_cpc.csv"
 )
 
 # --- 1. Data Loading and Preprocessing (Single Responsibility Principle) ---
