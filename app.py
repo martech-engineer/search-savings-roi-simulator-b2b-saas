@@ -12,35 +12,35 @@ SAMPLE_FILE_URL = (
 st.set_page_config(page_title="SEO ROI & Savings Forecasting", layout="wide")
 st.title("📈 SEO ROI & Savings Forecasting Tool for B2B SaaS")
 
-# — Info section explaining the math
-with st.expander("ℹ️ How the app works", expanded=True):
-    st.markdown("""
-1.  **Load your GSC data** (we lowercase all column names on load). If not, we use the default sample file.
-    If no `cpc` column is present, we simulate values between $0.50–$3.00.
-2.  **CTR benchmarks** by position map an expected click-through rate for positions 1–20.
-3.  **Incremental clicks** =
-    &nbsp;&nbsp;Projected_Clicks – Current_Clicks
-    &nbsp;&nbsp;• Current_Clicks = Impressions × Current_CTR
-    &nbsp;&nbsp;• Projected_Clicks = Impressions × Target_CTR
-4.  **Financials**
-    &nbsp;&nbsp;• Avoided Paid Spend = Incremental_Clicks × CPC. This represents the **money you *don't* have to spend on paid ads** because your organic SEO efforts are now bringing in those clicks and conversions.
-    &nbsp;&nbsp;• Net Savings vs Paid = Avoided Paid Spend – SEO Investment
-    &nbsp;&nbsp;• Incremental MRR = Customers × MRR_per_Customer
-    &nbsp;&nbsp;• SEO ROI = (Incremental MRR – SEO Investment) ÷ SEO Investment
+# ---
+## ℹ️ How the app works
 
-    **Understanding "Additional Paid Spend"**
-    The "Additional Paid Spend" input in the sidebar is a **hypothetical budget figure you provide for comparison**. It's *not* calculated from your GSC data or CPC. Instead, it allows you to:
-    * **Compare SEO's revenue generation directly against a specific paid ad budget.** For instance, if you're considering spending an extra $X on Google Ads, you can see if your SEO's projected incremental MRR is higher or lower than that $X.
-    * **Visualize the efficiency of your SEO investment.** If your SEO investment generates significantly more incremental MRR than a comparable "Additional Paid Spend," it highlights SEO as a potentially more effective use of marketing funds.
-    * The "Add Spend" metric will show :green[green] if your projected incremental MRR from SEO **trumps** (is greater than) this additional paid spend, and :red[red] if it does not.
+<div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px;">
+    <p>1. <b>Load your GSC data</b> (we lowercase all column names on load). If no file is uploaded, we use the default sample data. If no <code>cpc</code> column is present, we simulate values between $0.50–$3.00.</p>
+    <p>2. <b>CTR benchmarks</b> by position map an expected click-through rate for positions 1–20.</p>
+    <p>3. <b>Incremental Clicks</b> = Projected_Clicks – Current_Clicks</p>
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;• Current_Clicks = Impressions × Current_CTR</p>
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;• Projected_Clicks = Impressions × Target_CTR</p>
+    <p>4. <b>Financials</b></p>
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;• <b>Avoided Paid Spend</b> = Incremental_Clicks × CPC. This represents the money you <b>don't</b> have to spend on paid ads because your organic SEO efforts are now bringing in those clicks and conversions.</p>
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;• <b>Net Savings vs Paid</b> = Avoided Paid Spend – SEO Investment</p>
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;• <b>Incremental MRR</b> = Customers × MRR_per_Customer</p>
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;• <b>SEO ROI</b> = (Incremental MRR – SEO Investment) ÷ SEO Investment</p>
+    <p><b>Understanding "Additional Ad Spend"</b></p>
+    <p>The "Additional Ad Spend" input in the sidebar is a <b>hypothetical budget figure you provide for comparison</b>. It's <b>not</b> calculated from your GSC data or CPC. Instead, it allows you to:</p>
+    <ul>
+        <li><b>Compare SEO's revenue generation directly against a specific paid ad budget.</b> For instance, if you're considering spending an extra $X on Google Ads, you can see if your SEO's projected incremental MRR is higher or lower than that $X.</li>
+        <li><b>Visualize the efficiency of your SEO investment.</b> If your SEO investment generates significantly more incremental MRR than a comparable "Additional Ad Spend," it highlights SEO as a potentially more effective use of marketing funds.</li>
+    </ul>
+    <p>The "Ad Spend" metric will show <span style="color: green; font-weight: bold;">green</span> if your projected Incremental MRR from SEO <b>trumps</b> (is greater than) this additional ad spend, and <span style="color: red; font-weight: bold;">red</span> if it does not.</p>
+    <p>5. <b>Results</b></p>
+    <p>Top-line metrics + keyword-level table with impact labels.</p>
+</div>
+---
 
-5.  **Results**
-    Top-line metrics + keyword-level table with impact labels.
-    """, unsafe_allow_html=True)
+# 🔧 Assumptions & Inputs
 
-# — Sidebar inputs
 with st.sidebar:
-    st.header("🔧 Assumptions & Inputs")
     uploaded_file    = st.file_uploader("Upload GSC CSV", type="csv")
     target_position  = st.slider("Target SERP Position",
         1.0, 10.0, 4.0, 0.5)
@@ -51,7 +51,8 @@ with st.sidebar:
         10,    1000, 200, 10)
     seo_cost         = st.slider("Total SEO Investment ($)",
         1_000, 100_000, 10_000, 1_000)
-    add_spend        = st.slider("Additional Paid Spend ($)",
+    # Corrected to "Ad Spend"
+    add_spend        = st.slider("Additional Ad Spend ($)",
         0, 50_000, 0, 1_000)
 
 
@@ -195,10 +196,10 @@ if st.button("Run Forecast"):
             c6.metric("Avoided Paid Spend",     summary['avoid'])
             c7.metric("Net Savings vs Paid",    summary['net'])
 
-            # Add Spend section with conditional coloring
+            # Ad Spend section with conditional coloring
             with c8:
                 st.markdown(
-                    f"**Add Spend**<br>"
+                    f"**Ad Spend**<br>" # Corrected label
                     f"<span style='color: {'green' if summary['seo_trumps_add_spend'] else 'red'}; font-size: 24px; font-weight: bold;'>{summary['add_spend']}</span>",
                     unsafe_allow_html=True
                 )
