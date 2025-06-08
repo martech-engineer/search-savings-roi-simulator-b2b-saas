@@ -9,6 +9,7 @@ SAMPLE_FILE_URL = (
     "resolve/main/sample_keyword_data_cpc.csv"
 )
 
+# Helper functions come here
 # --- CACHED CSV LOADER ---
 @st.cache_data
 def load_csv(uploaded_file_obj: st.runtime.uploaded_file_manager.UploadedFile | None, sample_file_url: str) -> pd.DataFrame | None:
@@ -111,7 +112,11 @@ class SeoAppUI:
     def _set_page_config(self):
         st.set_page_config(page_title="SEO ROI & Savings Forecasting", layout="wide")
         st.title("Search & Savings ROI Simulator for B2B SaaS")
-        st.markdown("App created by [Emilija Gjorgjevska](https://www.linkedin.com/in/emilijagjorgjevska/)")
+        st.markdown("""<br><div style="display: flex; justify-content: flex-start; align-items: center; gap: 16px;">
+        <span>App created by <a href="https://www.linkedin.com/in/emilijagjorgjevska/" target="_blank">Emilija Gjorgjevska</a></span>
+        <a href="https://buymeacoffee.com/emiliagjorgjevska" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
+        alt="Buy Me A Coffee" style="height: 40px;"></a></div><br>""", unsafe_allow_html=True)
+
 
     def _display_info_expander(self):
         with st.expander("ℹ️ How the app works [CLICK TO EXPAND]", expanded=False):
