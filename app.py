@@ -165,7 +165,7 @@ class SeoAppUI:
         st.markdown("App created by [Emilija Gjorgjevska](https://www.linkedin.com/in/emilijagjorgjevska/)")
 
     def _display_info_expander(self):
-        with st.expander("ℹ️ How the app works", expanded=True):
+        with st.expander("ℹ️ How the app works [CLICK TO EXPAND]", expanded=False):
             st.markdown(
                 """
             <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px;">
