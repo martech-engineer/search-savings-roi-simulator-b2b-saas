@@ -32,7 +32,7 @@ with st.expander("ℹ️ How the app works", expanded=True):
         <li><b>Compare SEO's revenue generation directly against a specific paid ad budget.</b> For instance, if you're considering spending an extra \$X on Google Ads, you can see if your SEO's projected incremental MRR is higher or lower than that \$X.</li>
         <li><b>Visualize the efficiency of your SEO investment.</b> If your SEO investment generates significantly more incremental MRR than a comparable "Additional Ad Spend," it highlights SEO as a potentially more effective use of marketing funds.</li>
     </ul>
-    <p>The "Ad Spend" metric will show <span style="color: green; font-weight: bold;">green</span> if your projected Incremental MRR from SEO <b>trumps</b> (is greater than) this additional ad spend, and <span style="color: red; font-weight: bold;">red</span> if it does not.</p>
+    <p>The "Ad Spend" metric will be <span style="color: green; font-weight: bold;">green</span> if your projected Incremental MRR from SEO is <b>greater than</b> this additional ad spend, and <span style="color: red; font-weight: bold;">red</span> if it does not.</p>
     <p>5. <b>Results</b></p>
     <p>Top-line metrics + keyword-level table with impact labels.</p></div>""", unsafe_allow_html=True) # Ensure this is within the st.expander context
 
