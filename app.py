@@ -17,7 +17,7 @@ st.title("📈 SEO ROI & Savings Forecasting Tool for B2B SaaS")
 with st.expander("ℹ️ How the app works", expanded=True):
     st.markdown("""
 <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px;">
-    <p>1. <b>Load your GSC data</b> (we lowercase all column names on load). If no file is uploaded, we use the default sample data. If no <code>cpc</code> column is present, we simulate values between \\$0.50–\\$3.00.</p>
+    <p>1. <b>Load your GSC data</b> (we lowercase all column names on load). If no file is uploaded, we use the default sample data. If no <code>cpc</code> column is present, we simulate values between 0.50–3.00 dollars.</p>
     <p>2. <b>CTR benchmarks</b> by position map an expected click-through rate for positions 1–20.</p>
     <p>3. <b>Incremental Clicks</b> = Projected_Clicks – Current_Clicks</p>
     <p>&nbsp;&nbsp;&nbsp;&nbsp;• Current_Clicks = Impressions × Current_CTR</p>
