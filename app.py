@@ -18,25 +18,25 @@ class DataLoader:
         self.sample_file_url = sample_file_url
 
     @st.cache_data
-    # FIX: Change 'self' to '_self' in the function signature
-    def load_csv(self, _uploaded_file_obj: st.runtime.uploaded_file_manager.UploadedFile | None) -> pd.DataFrame | None:
+    # FIX: Change 'self' to '_self' in the function signature AND rename the parameter
+    def load_csv(_self, uploaded_file_obj: st.runtime.uploaded_file_manager.UploadedFile | None) -> pd.DataFrame | None:
         """
         Loads the GSC data from an uploaded CSV or a sample URL,
         normalizes column names, and ensures a 'cpc' column exists.
 
         Args:
-            _uploaded_file_obj (streamlit.runtime.uploaded_file_manager.UploadedFile): The file object
+            _self: The instance of the DataLoader class (ignored by Streamlit caching).
+            uploaded_file_obj (streamlit.runtime.uploaded_file_manager.UploadedFile): The file object
                                                                              uploaded by the user, or None.
-                                                                             (Underscore prefix to prevent hashing by st.cache_data)
         Returns:
             pd.DataFrame: The loaded and processed DataFrame, or None if an error occurs.
         """
         try:
-            # Use the parameter with the underscore prefix
-            if _uploaded_file_obj:
-                df = pd.read_csv(_uploaded_file_obj)
+            if uploaded_file_obj:
+                df = pd.read_csv(uploaded_file_obj)
             else:
-                df = pd.read_csv(self.sample_file_url) # 'self' is implicitly handled by st.cache_data in this context
+                # Use _self.sample_file_url since _self is the instance
+                df = pd.read_csv(_self.sample_file_url)
         except Exception as e:
             st.error(f"Error loading file: {e}")
             return None
@@ -48,10 +48,11 @@ class DataLoader:
             df["cpc"] = np.round(np.random.uniform(0.5, 3.0, size=len(df)), 2)
         return df
 
-# ... (rest of your code remains the same) ...
-
+# --- 2. Core Calculation Logic (Single Responsibility Principle) ---
 class SeoCalculator:
-    # ... (SeoCalculator class code) ...
+    """
+    Performs core calculations for SEO forecasting.
+    """
     def __init__(self):
         # Define Click-Through Rate (CTR) benchmarks by position
         self.ctr_benchmarks = {i: v for i, v in zip(range(1, 11), [0.25, 0.15, 0.10, 0.08, 0.06, 0.04, 0.03, 0.02, 0.015, 0.01])}
@@ -68,6 +69,8 @@ class SeoCalculator:
         """Helper to get CTR based on position, defaulting to 0.005 for positions > 20."""
         return self.ctr_benchmarks.get(int(round(position)), 0.005)
 
+    # Note: _validate_and_rename_columns does not need @st.cache_data if its inputs are always hashable
+    # and it's called from a cached function. If it *were* cached, 'self' -> '_self' would apply.
     def _validate_and_rename_columns(self, df: pd.DataFrame) -> pd.DataFrame | None:
         """Validates required columns and renames them to a standardized format."""
         found_columns = {}
@@ -82,10 +85,10 @@ class SeoCalculator:
         return df.rename(columns={found_columns[k]: k for k in found_columns})
 
     @st.cache_data
-    # FIX: Change 'self' to '_self' in the function signature for calculate_metrics too
+    # FIX: Change 'self' to '_self' in the function signature AND rename the parameter
     def calculate_metrics(
-        self,
-        _df: pd.DataFrame, # Changed to _df
+        _self, # Changed to _self
+        df: pd.DataFrame,
         target_position: float,
         conversion_rate: float,
         close_rate: float,
@@ -100,13 +103,13 @@ class SeoCalculator:
             tuple: A dictionary of calculated metrics and a DataFrame with detailed results.
                    Returns (None, pd.DataFrame()) if required columns are missing.
         """
-        # Use _df internally
-        df_processed = self._validate_and_rename_columns(_df.copy())
+        # Use _self.ctr_benchmarks and _self.required_columns_map, etc.
+        df_processed = _self._validate_and_rename_columns(df.copy())
         if df_processed is None:
             return None, pd.DataFrame()
 
-        df_processed["current_ctr"] = df_processed["position"].apply(self._get_ctr)
-        target_ctr_value = self._get_ctr(target_position)
+        df_processed["current_ctr"] = df_processed["position"].apply(_self._get_ctr)
+        target_ctr_value = _self._get_ctr(target_position)
         df_processed["target_ctr"] = target_ctr_value
 
         df_processed["current_clicks"] = df_processed["impressions"] * df_processed["current_ctr"]
@@ -148,6 +151,7 @@ class SeoCalculator:
         }
         return metrics, df_processed
 
+# --- 3. Streamlit User Interface (Single Responsibility Principle) ---
 class SeoAppUI:
     """
     Manages the Streamlit user interface and presentation.
@@ -293,19 +297,20 @@ class SeoAppUI:
         self._display_info_expander()
         uploaded_file, target_position, conversion_rate, close_rate, mrr_per_customer, seo_cost, add_spend = self._get_sidebar_inputs()
 
-        # Call load_csv with _uploaded_file_obj
-        df = self.data_loader.load_csv(_uploaded_file_obj=uploaded_file)
+        # Call load_csv, passing the instance as the first argument, which is now _self
+        df = self.data_loader.load_csv(self.data_loader, uploaded_file) # Pass self.data_loader explicitly
 
         if df is not None:
-            # Call calculate_metrics with _df
+            # Call calculate_metrics, passing the instance as the first argument, which is now _self
             metrics, df_results = self.seo_calculator.calculate_metrics(
-                _df=df, # Pass df to _df
-                target_position=target_position,
-                conversion_rate=conversion_rate,
-                close_rate=close_rate,
-                mrr_per_customer=mrr_per_customer,
-                seo_cost=seo_cost,
-                add_spend=add_spend,
+                self.seo_calculator, # Pass self.seo_calculator explicitly
+                df,
+                target_position,
+                conversion_rate,
+                close_rate,
+                mrr_per_customer,
+                seo_cost,
+                add_spend,
             )
 
             if metrics is not None:
