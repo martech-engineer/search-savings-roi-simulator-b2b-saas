@@ -196,7 +196,7 @@ if df is not None:
             # Increased font-size for the 'add_spend' value and added the message
             st.markdown(f"""
                 <div style="text-align: center;">
-                    <p style="font-size: 1.2em; margin-bottom: 0;">Additional Ad Spend (for comparison)</p>
+                    <p style="font-size: 1.2em; margin-bottom: 0;">Additional Ad Spend</p>
                     <p style="color:{ad_spend_color}; font-weight:bold; font-size: 2.5em; margin-top: 0;">${add_spend:,.2f}</p>
                     <p style="font-weight:bold; font-size: 1.5em; color:{ad_spend_color};">{ad_spend_message}</p>
                 </div>
