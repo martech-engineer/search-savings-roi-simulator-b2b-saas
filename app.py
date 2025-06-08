@@ -111,25 +111,24 @@ def calculate(df, target_position, conversion_rate, close_rate, mrr_per_customer
     ctr = {i: v for i, v in zip(range(1, 11), [0.25,0.15,0.10,0.08,0.06,0.04,0.03,0.02,0.015,0.01])}
     ctr.update({i: 0.005 for i in range(11,21)})
     get_ctr = lambda p: ctr.get(int(round(p)), 0.005)
-
     df['current_ctr'] = df['position'].apply(get_ctr)
     df['target_ctr'] = df['position'].apply(lambda x: ctr.get(int(round(target_position)), 0.005))
-    
+
     df['current_clicks'] = df['impressions'] * df['current_ctr']
     df['projected_clicks'] = df['impressions'] * df['target_ctr']
     df['incremental_clicks'] = df['projected_clicks'] - df['current_clicks']
-    
+
     df['avoided_paid_spend'] = df['incremental_clicks'] * df['cpc']
-    
+
     # Financial calculations
     total_avoided_paid_spend = df['avoided_paid_spend'].sum()
     net_savings_vs_paid = total_avoided_paid_spend - seo_cost
-    
+
     total_incremental_conversions = df['incremental_clicks'].sum() * (conversion_rate / 100)
     total_incremental_customers = total_incremental_conversions * (close_rate / 100)
-    
+
     incremental_mrr = total_incremental_customers * mrr_per_customer
-    
+
     # SEO ROI calculation
     if seo_cost > 0:
         seo_roi = (incremental_mrr - seo_cost) / seo_cost
@@ -144,7 +143,7 @@ def calculate(df, target_position, conversion_rate, close_rate, mrr_per_customer
             return '✅ Maintain & Grow'
         else:
             return '🎯 Reached Target'
-            
+
     df['impact_category'] = df.apply(categorize_impact, axis=1)
 
     return {
@@ -159,14 +158,12 @@ def calculate(df, target_position, conversion_rate, close_rate, mrr_per_customer
 # ---
 # Main app logic
 df = load_csv()
-
 if df is not None:
     metrics, df_results = calculate(df.copy(), target_position, conversion_rate, close_rate, mrr_per_customer, seo_cost, add_spend)
 
     if metrics is not None:
         st.write("---")
         st.header("📊 SEO Performance Summary")
-
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric(label="Total Avoided Paid Spend 💰", value=f"${metrics['total_avoided_paid_spend']:,.2f}")
@@ -174,7 +171,7 @@ if df is not None:
             st.metric(label="Net Savings vs Paid 📈", value=f"${metrics['net_savings_vs_paid']:,.2f}")
         with col3:
             st.metric(label="Incremental MRR  recurrent revenue 🚀", value=f"${metrics['incremental_mrr']:,.2f}")
-        
+
         col4, col5, col6 = st.columns(3)
         with col4:
             st.metric(label="Total Incremental Conversions 🎯", value=f"{metrics['total_incremental_conversions']:,.0f}")
@@ -182,25 +179,33 @@ if df is not None:
             st.metric(label="Total Incremental Customers 🤝", value=f"{metrics['total_incremental_customers']:,.0f}")
         with col6:
             st.metric(label="SEO ROI (Return on Investment) 💰", value=f"{metrics['seo_roi']:.2%}")
-        
+
         st.write("---")
         st.header("Hypothetical Comparison: SEO vs. Additional Ad Spend")
         col_ad1, col_ad2 = st.columns(2)
         with col_ad1:
             st.metric(label="Incremental MRR from SEO", value=f"${metrics['incremental_mrr']:,.2f}")
         with col_ad2:
-            ad_spend_color = "green" if metrics['incremental_mrr'] > add_spend else "red"
-            # Increased font-size for the 'add_spend' value
-            st.markdown(f"**Additional Ad Spend (for comparison)**: <span style='color:{ad_spend_color}; font-weight:bold; font-size: 2em;'>${add_spend:,.2f}</span>", unsafe_allow_html=True)
             if metrics['incremental_mrr'] > add_spend:
-                st.success(f"SEO's incremental MRR is ${metrics['incremental_mrr'] - add_spend:,.2f} higher than the additional ad spend!")
+                ad_spend_color = "green"
+                ad_spend_message = "SEO is a better investment!"
             else:
-                st.warning(f"Additional ad spend is ${add_spend - metrics['incremental_mrr']:,.2f} higher than SEO's incremental MRR.")
+                ad_spend_color = "red"
+                ad_spend_message = "Ad Spend is a better investment!"
+
+            # Increased font-size for the 'add_spend' value and added the message
+            st.markdown(f"""
+                <div style="text-align: center;">
+                    <p style="font-size: 1.2em; margin-bottom: 0;">Additional Ad Spend (for comparison)</p>
+                    <p style="color:{ad_spend_color}; font-weight:bold; font-size: 2.5em; margin-top: 0;">${add_spend:,.2f}</p>
+                    <p style="font-weight:bold; font-size: 1.5em; color:{ad_spend_color};">{ad_spend_message}</p>
+                </div>
+            """, unsafe_allow_html=True)
 
         st.write("---")
         st.header("Detailed Keyword Performance") # Kept as st.header for prominence
         st.dataframe(df_results[[
-            'query', 'impressions', 'position', 'current_ctr', 'target_ctr', 
-            'current_clicks', 'projected_clicks', 'incremental_clicks', 
+            'query', 'impressions', 'position', 'current_ctr', 'target_ctr',
+            'current_clicks', 'projected_clicks', 'incremental_clicks',
             'cpc', 'avoided_paid_spend', 'impact_category'
         ]].sort_values(by='incremental_clicks', ascending=False), use_container_width=True)
