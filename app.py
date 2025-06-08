@@ -29,7 +29,7 @@ with st.expander("ℹ️ How the app works", expanded=True):
     <p><b>Understanding "Additional Ad Spend"</b></p>
     <p>The "Additional Ad Spend" input in the sidebar is a <b>hypothetical budget figure you provide for comparison</b>. It's <b>not</b> calculated from your GSC data or CPC. Instead, it allows you to:</p>
     <ul>
-        <li><b>Compare SEO's revenue generation directly against a specific paid ad budget.</b> For instance, if you're considering spending an extra \\$X on Google Ads, you can see if your SEO's projected incremental MRR is higher or lower than that \\$X.</li>
+        <li><b>Compare SEO's revenue generation directly against a specific paid ad budget.</b> For instance, if you're considering spending an extra \$X on Google Ads, you can see if your SEO's projected incremental MRR is higher or lower than that \$X.</li>
         <li><b>Visualize the efficiency of your SEO investment.</b> If your SEO investment generates significantly more incremental MRR than a comparable "Additional Ad Spend," it highlights SEO as a potentially more effective use of marketing funds.</li>
     </ul>
     <p>The "Ad Spend" metric will show <span style="color: green; font-weight: bold;">green</span> if your projected Incremental MRR from SEO <b>trumps</b> (is greater than) this additional ad spend, and <span style="color: red; font-weight: bold;">red</span> if it does not.</p>
@@ -181,7 +181,7 @@ if df is not None:
             st.metric(label="SEO ROI (Return on Investment) 💰", value=f"{metrics['seo_roi']:.2%}")
         
         st.write("---")
-        st.header("Detailed Keyword Performance")
+        st.header("Detailed Keyword Performance") # Kept as st.header for prominence
         st.dataframe(df_results[[
             'query', 'impressions', 'position', 'current_ctr', 'target_ctr', 
             'current_clicks', 'projected_clicks', 'incremental_clicks', 
@@ -195,7 +195,8 @@ if df is not None:
             st.metric(label="Incremental MRR from SEO", value=f"${metrics['incremental_mrr']:,.2f}")
         with col_ad2:
             ad_spend_color = "green" if metrics['incremental_mrr'] > add_spend else "red"
-            st.markdown(f"**Additional Ad Spend (for comparison)**: <span style='color:{ad_spend_color}; font-weight:bold;'>${add_spend:,.2f}</span>", unsafe_allow_html=True)
+            # Increased font-size for the 'add_spend' value
+            st.markdown(f"**Additional Ad Spend (for comparison)**: <span style='color:{ad_spend_color}; font-weight:bold; font-size: 2em;'>${add_spend:,.2f}</span>", unsafe_allow_html=True)
             if metrics['incremental_mrr'] > add_spend:
                 st.success(f"SEO's incremental MRR is ${metrics['incremental_mrr'] - add_spend:,.2f} higher than the additional ad spend!")
             else:
