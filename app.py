@@ -1,28 +1,40 @@
-import pandas as pd
-import numpy as np
-import streamlit as st
+ import pandas as pd
+ import numpy as np
+ import streamlit as st
+ import requests
 
-# ▶️ Use the URL you provided
-SAMPLE_FILE_URL = "https://huggingface.co/spaces/Em4e/seo-b2b-saas-forecasting-tool/resolve/main/sample_gsc_data.csv"
+ # ▶️ Use the URL you provided
+ SAMPLE_FILE_URL = "https://huggingface.co/spaces/Em4e/seo-b2b-saas-forecasting-tool/resolve/main/sample_gsc_data.csv"
 
-st.set_page_config(page_title="SEO ROI Forecasting Tool for B2B SaaS", layout="wide")
-st.title("📈 SEO ROI Forecasting Tool for B2B SaaS")
+ st.set_page_config(page_title="SEO ROI Forecasting Tool for B2B SaaS", layout="wide")
+ st.title("📈 SEO ROI Forecasting Tool for B2B SaaS")
 
-st.markdown("""
-This app helps you estimate the **financial upside** of ranking improvements for your SEO keywords,  
-and compare that to what it would cost you in paid ads.  
-<br>
+ st.markdown("""
+ This app helps you estimate the **financial upside** of ranking improvements for your SEO keywords,  
+ and compare that to what it would cost you in paid ads.  
+ <br>
+ 
+ 👉 **Make sure your CSV has a `CPC` column** (cost per click in $).  
+ If you don’t, we’ll simulate one for you.  
+ <br>
+ 
+ Developed by: [Emilija Gjorgjevska](https://www.linkedin.com/in/emilijagjorgjevska/)
+ """, unsafe_allow_html=True)
 
-👉 **Make sure your CSV has a `CPC` column** (cost per click in $).  
-If you don’t, we’ll simulate one for you.  
-<br>
++# ———————
++# Download button for the sample file
++sample_bytes = requests.get(SAMPLE_FILE_URL).content
++st.download_button(
++    label="📥 Download sample CSV",
++    data=sample_bytes,
++    file_name="sample_gsc_data.csv",
++    mime="text/csv",
++)
++# ———————
 
-Developed by: [Emilija Gjorgjevska](https://www.linkedin.com/in/emilijagjorgjevska/)
-""", unsafe_allow_html=True)
-
-# === Sidebar inputs ===
-with st.sidebar:
-    st.header("🔧 Assumptions & Inputs")
+ # === Sidebar inputs ===
+ with st.sidebar:
+    st.header("🔧 Assumptions & Inputs")    st.header("🔧 Assumptions & Inputs")
     uploaded_file    = st.file_uploader("Upload Google Search Console CSV", type="csv")
     target_position  = st.slider("Target SERP Position",        1.0, 10.0, 4.0, 0.5)
     conversion_rate  = st.slider("Conversion Rate (% → signup)", 0.1, 10.0, 2.0, 0.1)
