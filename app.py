@@ -15,6 +15,7 @@ SAMPLE_FILE_URL = (
 # === Load & normalize CSV ===
 # This function handles loading the GSC data, either from an uploaded file or the sample URL.
 # It also standardizes column names and simulates CPC values if missing.
+@st.cache_data # Caches the output of this function to improve performance.
 def load_csv(uploaded_file_obj):
     """
     Loads the GSC data from an uploaded CSV or a sample URL,
@@ -49,6 +50,7 @@ def load_csv(uploaded_file_obj):
 # === Core calculation ===
 # This function performs the main calculations for SEO performance, including
 # click-through rates, incremental clicks, avoided paid spend, and ROI.
+@st.cache_data # Caches the output of this function to improve performance.
 def calculate(
     df,
     target_position,
@@ -252,7 +254,7 @@ if df is not None:  # Proceed only if data loading was successful
             )
         with col2:
             st.metric(
-                label="Net Savings vs Paid 📈",
+                label="Net Savings vs Paid �",
                 value=f"${metrics['net_savings_vs_paid']:,.2f}",
             )
         with col3:
