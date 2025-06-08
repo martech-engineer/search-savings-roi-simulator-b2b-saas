@@ -118,24 +118,52 @@ class SeoAppUI:
             st.markdown(
                 """
                 <div style="background-color: #f0f2f6; padding: 20px; border-radius: 10px;">
-                <p>1. <b>Load your GSC data</b>. If no file is uploaded, a sample file is used. If no <code>cpc</code> is present, it will be simulated.</p>
-                <p>2. <b>CTR benchmarks</b> are applied for positions 1–20 to calculate expected clicks.</p>
-                <p>3. <b>Incremental Clicks = Projected - Current</b>. Financial impact is calculated from these changes.</p>
+                  <p><b>1. Load Your GSC Data</b><br>
+                  If no file is uploaded, a sample is used. All column names are lowercased. If no <code>cpc</code> column is found, CPC values are simulated between 0.50–3.00 USD.</p>
+            
+                  <p><b>2. CTR Benchmarks by Position</b><br>
+                  Expected click-through rates (CTR) are mapped for positions 1–20 to estimate traffic uplift.</p>
+            
+                  <p><b>3. Incremental Clicks</b><br>
+                  <code>Incremental Clicks = Projected - Current</code><br>
+                  &nbsp;&nbsp;• Current = Impressions × Current CTR<br>
+                  &nbsp;&nbsp;• Projected = Impressions × Target CTR</p>
+            
+                  <p><b>4. Financial Impact</b><br>
+                  &nbsp;&nbsp;• <b>Avoided Paid Spend</b> = Incremental Clicks × CPC (value of organic traffic replacing paid ads)<br>
+                  &nbsp;&nbsp;• <b>Net Savings</b> = Avoided Spend – SEO Investment<br>
+                  &nbsp;&nbsp;• <b>Incremental MRR</b> = Customers × MRR per Customer<br>
+                  &nbsp;&nbsp;• <b>SEO ROI</b> = (Incremental MRR – SEO Investment) ÷ SEO Investment</p>
+            
+                  <p><b>5. Understanding “Ad Spend”</b><br>
+                  This is a <b>user-defined hypothetical amount</b> used only for comparison. It is not derived from CPC or added to SEO cost. The app compares:</p>
+                  <ul>
+                    <li><b>SEO's incremental MRR</b> from your defined SEO investment</li>
+                    <li><b>Against a fixed ad spend</b> (e.g. what you might spend on paid campaigns)</li>
+                  </ul>
+                  <p>The “Ad Spend” box turns <span style="color: green; font-weight: bold;">green</span> when SEO outperforms ads, or <span style="color: red; font-weight: bold;">red</span> otherwise.</p>
+            
+                  <p><b>6. Interpreting Results</b></p>
+                  <ul>
+                    <li><b>Target SERP Position</b>: Acts as a uniform benchmark applied to all queries to project improvement.</li>
+                    <li><b>Focus on High-Impact Keywords</b>: In the results table, look for “🚀 Improvement” rows with high impressions and incremental clicks — these are your SEO sweet spots.</li>
+                  </ul>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
 
+
     def _get_sidebar_inputs(self):
         with st.sidebar:
             st.header("🔧 Assumptions & Inputs")
             uploaded_file = st.file_uploader("Upload queries CSV data", type="csv")
-            target_position = st.slider("Target SERP Position", 1.0, 10.0, 4.0, 0.5)
+            target_position = st.slider("Target SERP Position", 1.0, 10.0, 4.0, 0.5, help="Sets the target position for all queries. Affects projected CTR and traffic uplift.")
             conversion_rate = st.slider("Conversion Rate (% → signup)", 0.1, 10.0, 2.0, 0.1)
             close_rate = st.slider("Close Rate (% → customer)", 1.0, 100.0, 20.0, 1.0)
             mrr_per_customer = st.slider("MRR per Customer ($)", 10, 1000, 200, 10)
             seo_cost = st.slider("Total SEO Investment ($)", 1_000, 100_000, 10_000, 1_000)
-            add_spend = st.slider("Additional Ad Spend ($)", 0, 50_000, 0, 1_000)
+            add_spend = st.slider("Ad Spend ($)", 0, 50_000, 0, 1_000, help="Full ad budget used for comparison. It does NOT include or depend on the SEO spend.")
         return uploaded_file, target_position, conversion_rate, close_rate, mrr_per_customer, seo_cost, add_spend
 
     def _display_summary_metrics(self, metrics: dict):
