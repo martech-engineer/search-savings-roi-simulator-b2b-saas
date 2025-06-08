@@ -18,13 +18,14 @@ class DataLoader:
         self.sample_file_url = sample_file_url
 
     @st.cache_data
-    def load_csv(self, uploaded_file_obj: st.uploaded_file_manager.UploadedFile | None) -> pd.DataFrame | None:
+    # FIX: Change the type hint for uploaded_file_obj
+    def load_csv(self, uploaded_file_obj: st.runtime.uploaded_file_manager.UploadedFile | None) -> pd.DataFrame | None:
         """
         Loads the GSC data from an uploaded CSV or a sample URL,
         normalizes column names, and ensures a 'cpc' column exists.
 
         Args:
-            uploaded_file_obj (streamlit.uploaded_file_manager.UploadedFile): The file object
+            uploaded_file_obj (streamlit.runtime.uploaded_file_manager.UploadedFile): The file object
                                                                              uploaded by the user, or None.
         Returns:
             pd.DataFrame: The loaded and processed DataFrame, or None if an error occurs.
@@ -45,11 +46,10 @@ class DataLoader:
             df["cpc"] = np.round(np.random.uniform(0.5, 3.0, size=len(df)), 2)
         return df
 
-# --- 2. Core Calculation Logic (Single Responsibility Principle) ---
+# ... (rest of your code remains the same) ...
+
 class SeoCalculator:
-    """
-    Performs core calculations for SEO forecasting.
-    """
+    # ... (SeoCalculator class code) ...
     def __init__(self):
         # Define Click-Through Rate (CTR) benchmarks by position
         self.ctr_benchmarks = {i: v for i, v in zip(range(1, 11), [0.25, 0.15, 0.10, 0.08, 0.06, 0.04, 0.03, 0.02, 0.015, 0.01])}
@@ -144,7 +144,6 @@ class SeoCalculator:
         }
         return metrics, df_processed
 
-# --- 3. Streamlit User Interface (Single Responsibility Principle) ---
 class SeoAppUI:
     """
     Manages the Streamlit user interface and presentation.
