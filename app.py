@@ -181,14 +181,6 @@ if df is not None:
             st.metric(label="SEO ROI (Return on Investment) 💰", value=f"{metrics['seo_roi']:.2%}")
         
         st.write("---")
-        st.header("Detailed Keyword Performance") # Kept as st.header for prominence
-        st.dataframe(df_results[[
-            'query', 'impressions', 'position', 'current_ctr', 'target_ctr', 
-            'current_clicks', 'projected_clicks', 'incremental_clicks', 
-            'cpc', 'avoided_paid_spend', 'impact_category'
-        ]].sort_values(by='incremental_clicks', ascending=False), use_container_width=True)
-
-        st.write("---")
         st.header("Hypothetical Comparison: SEO vs. Additional Ad Spend")
         col_ad1, col_ad2 = st.columns(2)
         with col_ad1:
@@ -201,3 +193,11 @@ if df is not None:
                 st.success(f"SEO's incremental MRR is ${metrics['incremental_mrr'] - add_spend:,.2f} higher than the additional ad spend!")
             else:
                 st.warning(f"Additional ad spend is ${add_spend - metrics['incremental_mrr']:,.2f} higher than SEO's incremental MRR.")
+
+        st.write("---")
+        st.header("Detailed Keyword Performance") # Kept as st.header for prominence
+        st.dataframe(df_results[[
+            'query', 'impressions', 'position', 'current_ctr', 'target_ctr', 
+            'current_clicks', 'projected_clicks', 'incremental_clicks', 
+            'cpc', 'avoided_paid_spend', 'impact_category'
+        ]].sort_values(by='incremental_clicks', ascending=False), use_container_width=True)
