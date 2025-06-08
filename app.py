@@ -111,13 +111,13 @@ def calculate(df, target_position, conversion_rate, close_rate, mrr_per_customer
     ctr = {i: v for i, v in zip(range(1, 11), [0.25,0.15,0.10,0.08,0.06,0.04,0.03,0.02,0.015,0.01])}
     ctr.update({i: 0.005 for i in range(11,21)})
     get_ctr = lambda p: ctr.get(int(round(p)), 0.005)
+
     df['current_ctr'] = df['position'].apply(get_ctr)
     df['target_ctr'] = df['position'].apply(lambda x: ctr.get(int(round(target_position)), 0.005))
 
     df['current_clicks'] = df['impressions'] * df['current_ctr']
     df['projected_clicks'] = df['impressions'] * df['target_ctr']
     df['incremental_clicks'] = df['projected_clicks'] - df['current_clicks']
-
     df['avoided_paid_spend'] = df['incremental_clicks'] * df['cpc']
 
     # Financial calculations
@@ -126,7 +126,6 @@ def calculate(df, target_position, conversion_rate, close_rate, mrr_per_customer
 
     total_incremental_conversions = df['incremental_clicks'].sum() * (conversion_rate / 100)
     total_incremental_customers = total_incremental_conversions * (close_rate / 100)
-
     incremental_mrr = total_incremental_customers * mrr_per_customer
 
     # SEO ROI calculation
@@ -164,6 +163,7 @@ if df is not None:
     if metrics is not None:
         st.write("---")
         st.header("📊 SEO Performance Summary")
+
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric(label="Total Avoided Paid Spend 💰", value=f"${metrics['total_avoided_paid_spend']:,.2f}")
@@ -182,25 +182,29 @@ if df is not None:
 
         st.write("---")
         st.header("Hypothetical Comparison: SEO vs. Additional Ad Spend")
-        col_ad1, col_ad2 = st.columns(2)
+
+        col_ad1, col_ad2, col_advice = st.columns([1, 1, 1]) # Added a third column for advice
+
         with col_ad1:
             st.metric(label="Incremental MRR from SEO", value=f"${metrics['incremental_mrr']:,.2f}")
-        with col_ad2:
-            if metrics['incremental_mrr'] > add_spend:
-                ad_spend_color = "green"
-                ad_spend_message = "SEO is a better investment!"
-            else:
-                ad_spend_color = "red"
-                ad_spend_message = "Ad Spend is a better investment!"
 
-            # Increased font-size for the 'add_spend' value and added the message
+        with col_ad2:
+            st.metric(label="Additional Ad Spend", value=f"${add_spend:,.2f}")
+
+        with col_advice:
+            if metrics['incremental_mrr'] > add_spend:
+                advice_message = "SEO is a better investment!"
+                advice_color = "green"
+            else:
+                advice_message = "Ad Spend may yield higher returns."
+                advice_color = "red"
             st.markdown(f"""
                 <div style="text-align: center;">
-                    <p style="font-size: 1.2em; margin-bottom: 0;">Additional Ad Spend</p>
-                    <p style="color:{ad_spend_color}; font-weight:bold; font-size: 2.5em; margin-top: 0;">${add_spend:,.2f}</p>
-                    <p style="font-weight:bold; font-size: 1.5em; color:{ad_spend_color};">{ad_spend_message}</p>
+                    <p style="font-size: 1.2em; margin-bottom: 0;">Advice</p>
+                    <p style="color:{advice_color}; font-weight:bold; font-size: 1.5em; margin-top: 0;">{advice_message}</p>
                 </div>
             """, unsafe_allow_html=True)
+
 
         st.write("---")
         st.header("Detailed Keyword Performance") # Kept as st.header for prominence
