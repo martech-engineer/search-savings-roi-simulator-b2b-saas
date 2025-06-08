@@ -157,8 +157,8 @@ def calculate(
 # Set Streamlit page configuration for a wider layout and a descriptive title.
 st.set_page_config(page_title="SEO ROI & Savings Forecasting", layout="wide")
 st.title("📈 B2B SaaS SEO ROI & Savings Simulator")
-
-# ---
+st.write("---")
+st.markdown("App created by [Emilija Gjorgjevska](https://www.linkedin.com/in/emilijagjorgjevska/)")
 # ℹ️ How the app works
 # This section provides an expandable information box explaining the app's methodology.
 with st.expander("ℹ️ How the app works", expanded=True):
@@ -254,7 +254,7 @@ if df is not None:  # Proceed only if data loading was successful
             )
         with col2:
             st.metric(
-                label="Net Savings vs Paid �",
+                label="Net Savings vs Paid 📈",
                 value=f"${metrics['net_savings_vs_paid']:,.2f}",
             )
         with col3:
