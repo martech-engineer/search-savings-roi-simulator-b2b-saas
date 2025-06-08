@@ -10,7 +10,7 @@ SAMPLE_FILE_URL = (
 )
 
 st.set_page_config(page_title="SEO ROI & Savings Forecasting", layout="wide")
-st.title("📈 SEO ROI & Savings Forecasting Tool for B2B SaaS")
+st.title("📈 B2B SaaS SEO ROI & Savings Simulator")
 
 # ---
 # ℹ️ How the app works
