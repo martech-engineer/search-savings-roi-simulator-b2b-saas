@@ -18,23 +18,25 @@ class DataLoader:
         self.sample_file_url = sample_file_url
 
     @st.cache_data
-    # FIX: Change the type hint for uploaded_file_obj
-    def load_csv(self, uploaded_file_obj: st.runtime.uploaded_file_manager.UploadedFile | None) -> pd.DataFrame | None:
+    # FIX: Change 'self' to '_self' in the function signature
+    def load_csv(self, _uploaded_file_obj: st.runtime.uploaded_file_manager.UploadedFile | None) -> pd.DataFrame | None:
         """
         Loads the GSC data from an uploaded CSV or a sample URL,
         normalizes column names, and ensures a 'cpc' column exists.
 
         Args:
-            uploaded_file_obj (streamlit.runtime.uploaded_file_manager.UploadedFile): The file object
+            _uploaded_file_obj (streamlit.runtime.uploaded_file_manager.UploadedFile): The file object
                                                                              uploaded by the user, or None.
+                                                                             (Underscore prefix to prevent hashing by st.cache_data)
         Returns:
             pd.DataFrame: The loaded and processed DataFrame, or None if an error occurs.
         """
         try:
-            if uploaded_file_obj:
-                df = pd.read_csv(uploaded_file_obj)
+            # Use the parameter with the underscore prefix
+            if _uploaded_file_obj:
+                df = pd.read_csv(_uploaded_file_obj)
             else:
-                df = pd.read_csv(self.sample_file_url)
+                df = pd.read_csv(self.sample_file_url) # 'self' is implicitly handled by st.cache_data in this context
         except Exception as e:
             st.error(f"Error loading file: {e}")
             return None
@@ -80,9 +82,10 @@ class SeoCalculator:
         return df.rename(columns={found_columns[k]: k for k in found_columns})
 
     @st.cache_data
+    # FIX: Change 'self' to '_self' in the function signature for calculate_metrics too
     def calculate_metrics(
         self,
-        df: pd.DataFrame,
+        _df: pd.DataFrame, # Changed to _df
         target_position: float,
         conversion_rate: float,
         close_rate: float,
@@ -97,7 +100,8 @@ class SeoCalculator:
             tuple: A dictionary of calculated metrics and a DataFrame with detailed results.
                    Returns (None, pd.DataFrame()) if required columns are missing.
         """
-        df_processed = self._validate_and_rename_columns(df.copy())
+        # Use _df internally
+        df_processed = self._validate_and_rename_columns(_df.copy())
         if df_processed is None:
             return None, pd.DataFrame()
 
@@ -243,7 +247,8 @@ class SeoAppUI:
         with col_ad1:
             st.metric("Incremental MRR from SEO", f"${metrics['incremental_mrr']:,.2f}")
         with col_ad2:
-            st.metric("Additional Ad Spend", value=f"${add_spend:,.2f}")
+            st.metric("Additional Ad Spend", value=f"${add_spend:,.2f}"
+            )
         with col_advice:
             if metrics["incremental_mrr"] > add_spend:
                 advice_message = "SEO is a better investment!"
@@ -288,17 +293,19 @@ class SeoAppUI:
         self._display_info_expander()
         uploaded_file, target_position, conversion_rate, close_rate, mrr_per_customer, seo_cost, add_spend = self._get_sidebar_inputs()
 
-        df = self.data_loader.load_csv(uploaded_file)
+        # Call load_csv with _uploaded_file_obj
+        df = self.data_loader.load_csv(_uploaded_file_obj=uploaded_file)
 
         if df is not None:
+            # Call calculate_metrics with _df
             metrics, df_results = self.seo_calculator.calculate_metrics(
-                df,
-                target_position,
-                conversion_rate,
-                close_rate,
-                mrr_per_customer,
-                seo_cost,
-                add_spend,
+                _df=df, # Pass df to _df
+                target_position=target_position,
+                conversion_rate=conversion_rate,
+                close_rate=close_rate,
+                mrr_per_customer=mrr_per_customer,
+                seo_cost=seo_cost,
+                add_spend=add_spend,
             )
 
             if metrics is not None:
