@@ -168,7 +168,7 @@ with st.expander("ℹ️ How the app works", expanded=True):
       
       <p>5. <b>Interpreting Results & Assumptions</b></p>
       <ul>
-        <li><b>Target SERP Position:</b> The 'Target SERP Position' is an <bold>aspirational average</bold> you aim for among your <bold>most important and achievable keywords</bold>, rather than a literal expectation for every single query. In reality, not all keywords will reach the same position due to varying competition and relevance.</li>
+        <li><b>Target SERP Position:</b> The 'Target SERP Position' is an <u>aspirational average</u> you aim for among your <u>most important and achievable keywords</u>, rather than a literal expectation for every single query. In reality, not all keywords will reach the same position due to varying competition and relevance.</li>
         <li><b>High-Impact Queries:</b> While the model calculates for all queries, focus your analysis on the 'Detailed Keyword Performance' table. Look for queries with a '🚀 Improvement' impact category and high 'impressions' and 'incremental_clicks'. These are often your most promising opportunities for SEO effort.</li>
       </ul>
     </div>
