@@ -199,7 +199,7 @@ class SeoAppUI:
     def _get_sidebar_inputs(self) -> tuple:
         with st.sidebar:
             st.header("🔧 Assumptions & Inputs")
-            uploaded_file = st.file_uploader("Upload queries data CSV", type="csv")
+            uploaded_file = st.file_uploader("Upload queries CSV data", type="csv")
             target_position = st.slider(
                 "Target SERP Position",
                 1.0,
