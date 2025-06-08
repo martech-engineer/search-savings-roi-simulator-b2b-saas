@@ -212,7 +212,7 @@ class SeoAppUI:
             close_rate = st.slider("Close Rate (% → customer)", 1.0, 100.0, 20.0, 1.0)
             mrr_per_customer = st.slider("MRR per Customer ($)", 10, 1000, 200, 10)
             seo_cost = st.slider("Total SEO Investment ($)", 1_000, 100_000, 10_000, 1_000)
-            add_spend = st.slider("Additional Ad Spend ($)", 0, 50_000, 0, 1_000)
+            add_spend = st.slider("Additional Ad Spend ($)", 0, 50_000, 0, 1_000, help="A **hypothetical budget** for extra paid ad spend, not from your GSC data. Use it to directly compare SEO's projected incremental MRR with a potential ad investment.")
 
             sample_bytes = requests.get(SAMPLE_FILE_URL).content
             st.download_button(
