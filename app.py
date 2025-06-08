@@ -195,7 +195,8 @@ with st.sidebar:
     st.header("🔧 Assumptions & Inputs")
     uploaded_file = st.file_uploader("Upload GSC CSV", type="csv")
     target_position = st.slider(
-        "Target SERP Position", 1.0, 10.0, 4.0, 0.5
+        "Target SERP Position", 1.0, 10.0, 4.0, 0.5,
+        help="This is the **average search engine ranking you assume all your queries will achieve.** A lower number (e.g., position 1) indicates a higher, more visible ranking. This target position is used to project the future click-through rate for every query."
     )  # Desired average search engine result page position
     conversion_rate = st.slider(
         "Conversion Rate (% → signup)", 0.1, 10.0, 2.0, 0.1
